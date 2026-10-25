@@ -243,6 +243,18 @@ jobs:
           if [ "$SKIP_SETUP" = true ]; then args+=(--skip-setup); fi
           ./unixnu build payload "${args[@]}"
 
+      - name: Upload the kernel and payload (personal build, 1-day retention)
+        if: always() && steps.kernel.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: unixnu-fuxi-build
+          path: |
+            out/fuxi/*/fuxi/kernel/kernel.macho
+            out/fuxi/*/fuxi/kernel/kernel.macho.adt
+            out/fuxi/*/fuxi/payload/payload.img
+            out/fuxi/*/fuxi/payload/payload.json
+          if-no-files-found: warn
+          retention-days: 1
       - name: Collect the text logs
         id: logs
         if: always() && steps.check.outcome == 'success'
