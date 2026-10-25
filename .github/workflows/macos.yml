@@ -256,7 +256,8 @@ jobs:
           python3 - <<'PY'
           import os, re, shutil
           from pathlib import Path
-          source = Path(os.environ['WORK']) / 'logs'
+          root = Path('out')
+          sources = sorted(root.glob('*/logs')) + sorted(root.glob('*/*/*/logs'))
           target = Path(os.environ['RUNNER_TEMP']) / 'public-logs'
           shutil.rmtree(target, ignore_errors=True)
           target.mkdir(parents=True)
@@ -266,7 +267,7 @@ jobs:
           secrets = [os.environ.get('UNIXNU_UNIQUE_CHIP_ID', ''), inputs.get('trust_cache_url', ''), inputs.get('data_seed_url', '')]
           secrets = [value for value in secrets if value]
           count = 0
-          for path in sorted(source.glob('*.log')) if source.is_dir() else []:
+          for path in [p for src in sources for p in sorted(src.glob('*.log'))]:
               data = path.read_bytes()
               if b'\0' in data:
                   continue
